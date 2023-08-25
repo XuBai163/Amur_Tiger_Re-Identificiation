@@ -1,8 +1,8 @@
 from torchvision import transforms
 from torch.utils.data import dataset, dataloader
 from torchvision.datasets.folder import default_loader
-from utils.RandomErasing import RandomErasing
-from utils.RandomSampler import RandomSampler
+from utils.random_erasing import RandomErasing
+from utils.random_sampler import RandomSampler
 from torchvision.transforms import InterpolationMode
 from opt import opt
 import os

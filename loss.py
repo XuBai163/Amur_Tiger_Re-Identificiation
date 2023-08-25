@@ -1,6 +1,6 @@
 from torch.nn import CrossEntropyLoss
 from torch.nn.modules import loss
-from utils.TripletLoss import TripletLoss
+from utils.triplet_loss import TripletLoss
 
 
 class Loss(loss._Loss):
