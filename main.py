@@ -52,14 +52,14 @@ class Main():
             self.scheduler.step() # This line is moved to here due to UserWarnings
 
     # def evaluate(self, epoch):
-    def evaluate(self):
+    def evaluate(self, epoch):
         self.model.eval()
 
         print('extract features, this may take a few minutes')
         qf = extract_feature(self.model, tqdm(self.query_loader)).numpy()
         gf = extract_feature(self.model, tqdm(self.test_loader)).numpy()
-        # epoch_json = 'metric/metric_epoch' + str(epoch)
-        epoch_json = 'metric/metric_epoch_450'
+        epoch_json = 'metric/metric_epoch' + str(epoch)
+        # epoch_json = 'metric/metric_epoch_450'
         os.makedirs(epoch_json)
 
         def result(distmat, query_ids=None, gallery_ids=None,
@@ -187,14 +187,14 @@ if __name__ == '__main__':
         for epoch in range(1, opt.epoch + 1):
             print('\nepoch', epoch)
             main.train()
-            if epoch % 50 == 0:
-                os.makedirs('weights', exist_ok=True)
-                torch.save(model.state_dict(), ('weights/model_{}.pt'.format(epoch)))
             # if epoch % 50 == 0:
-            #     print('\nstart evaluate')
-            #     main.evaluate(epoch)
             #     os.makedirs('weights', exist_ok=True)
             #     torch.save(model.state_dict(), ('weights/model_{}.pt'.format(epoch)))
+            if epoch % 50 == 0:
+                print('\nstart evaluate')
+                main.evaluate(epoch)
+                os.makedirs('weights', exist_ok=True)
+                torch.save(model.state_dict(), ('weights/model_{}.pt'.format(epoch)))
 
     if opt.mode == 'evaluate':
         print('start evaluate')

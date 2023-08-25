@@ -15,7 +15,6 @@ from data_pose import Data
 from loss_pose import Loss
 from utils.extract_feature_pose import extract_feature
 from utils.get_optimizer import get_optimizer
-
 from utils.metrics import re_ranking
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'

@@ -66,8 +66,8 @@ class CVWC(dataset.Dataset):
         self.kpt = json.load(open('files/new_keypoints_train.json'))
         self._id2label = {_id: idx for idx, _id in enumerate(self.unique_ids)}
 
-        print("HERE IS THE NUMBER OF UNIQUE IDS: ", len(self.unique_ids), " Type: ", dtype)
-        print("HERE IS THE NUMBER OF Images: ", len(self.ids), " Type: ", dtype)
+        # print("HERE IS THE NUMBER OF UNIQUE IDS: ", len(self.unique_ids), " Type: ", dtype)
+        # print("HERE IS THE NUMBER OF Images: ", len(self.ids), " Type: ", dtype)
 
     def __getitem__(self, index):      
         path = self.imgs[index]
