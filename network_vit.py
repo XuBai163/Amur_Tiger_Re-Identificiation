@@ -21,22 +21,24 @@ class ViTNetwork(nn.Module):
             resnet.layer4
         )
 
+        # Upsampling layer
+        self.upsample = nn.Upsample((224, 224), mode='bilinear', align_corners=True)
+
         # Head network: ViT
-        self.vit = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224-in21k', add_pooling_layer=True)
+        self.vit = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224-in21k')
         for param in self.vit.parameters():
             param.requires_grad = True 
-        self.vit = nn.Sequential(*list(self.vit.children())[:-1]) # Remove the classification head
-        self.fc = nn.Linear(768, num_classes)  # Adjust the size depending on the ViT variant's feature size
+        self.vit = nn.Sequential(*list(self.vit.children())[:-1])  # Remove head
+        self.fc = nn.Linear(768, num_classes)  # Adjust the size 
 
     def forward(self, x):
         # Extract features from resnet50
         x = self.backbone(x)
 
+        # Upsample the features
+        x = self.upsample(x)
+
         # Flatten the features and pass to the ViT
-        B, C, H, W = x.shape
-        x = x.view(B, C, H * W).permute(0, 2, 1)  
         x = self.vit(x)
-        
         x = self.fc(x)
         return x
-

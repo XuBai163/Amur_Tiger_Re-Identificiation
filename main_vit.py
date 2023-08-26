@@ -11,7 +11,8 @@ from torch.optim import lr_scheduler
 import json
 from opt import opt
 from data import Data
-from network import MGN
+# from network import MGN
+from network_vit import ViTNetwork
 from loss import Loss
 from utils.get_optimizer import get_optimizer
 from utils.extract_feature import extract_feature
@@ -179,7 +180,7 @@ class Main():
 
 if __name__ == '__main__':
     data = Data()
-    model = MGN()
+    model = ViTNetwork()
     loss = Loss()
     main = Main(model, loss, data)
 
