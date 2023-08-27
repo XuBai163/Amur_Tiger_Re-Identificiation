@@ -8,7 +8,7 @@ class Loss(loss._Loss):
         super(Loss, self).__init__()
 
     def forward(self, outputs, labels):
-        print([output.shape for output in outputs])
+        # print([output.shape for output in outputs])
         cross_entropy_loss = CrossEntropyLoss()
         triplet_loss = TripletLoss(margin=1.2)
 
