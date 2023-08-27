@@ -13,7 +13,8 @@ from opt import opt
 from data import Data
 # from network import MGN
 from network_vit import ViTNetwork
-from loss import Loss
+# from loss import Loss
+from loss_vit import Loss
 from utils.get_optimizer import get_optimizer
 from utils.extract_feature import extract_feature
 from utils.metrics import re_ranking

@@ -127,3 +127,8 @@ class MGN(nn.Module):
         predict = torch.cat([fg_p1, fg_p2, fg_p3, f0_p2, f1_p2, f0_p3, f1_p3, f2_p3], dim=1)
 
         return predict, fg_p1, fg_p2, fg_p3, l_p1, l_p2, l_p3, l0_p2, l1_p2, l0_p3, l1_p3, l2_p3
+
+        # Global Features: fg_p1, fg_p2, and fg_p3
+        # Part Features: f0_p2, f1_p2, f0_p3, f1_p3, and f2_p3
+        # Predicted Class Scores: l_p1, l_p2, l_p3, l0_p2, l1_p2, l0_p3, l1_p3, and l2_p3
+        # Prediction: predict

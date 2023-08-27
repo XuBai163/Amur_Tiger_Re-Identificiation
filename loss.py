@@ -2,12 +2,13 @@ from torch.nn import CrossEntropyLoss
 from torch.nn.modules import loss
 from utils.triplet_loss import TripletLoss
 
-
+    
 class Loss(loss._Loss):
     def __init__(self):
         super(Loss, self).__init__()
 
     def forward(self, outputs, labels):
+        print([output.shape for output in outputs])
         cross_entropy_loss = CrossEntropyLoss()
         triplet_loss = TripletLoss(margin=1.2)
 
