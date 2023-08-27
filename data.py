@@ -34,10 +34,10 @@ class Data():
         self.train_loader = dataloader.DataLoader(self.trainset,
                                                   sampler=RandomSampler(self.trainset, batch_id=opt.batchid,
                                                                         batch_image=opt.batchimage),
-                                                  batch_size=opt.batchid * opt.batchimage, num_workers=0,
+                                                  batch_size=opt.batchid * opt.batchimage, num_workers=2,
                                                   pin_memory=True,drop_last = True)
-        self.test_loader = dataloader.DataLoader(self.testset, batch_size=opt.batchtest, num_workers=0, pin_memory=True)
-        self.query_loader = dataloader.DataLoader(self.queryset, batch_size=opt.batchtest, num_workers=0,
+        self.test_loader = dataloader.DataLoader(self.testset, batch_size=opt.batchtest, num_workers=2, pin_memory=True)
+        self.query_loader = dataloader.DataLoader(self.queryset, batch_size=opt.batchtest, num_workers=2,
                                                   pin_memory=True)
 
         if opt.mode == 'vis':
