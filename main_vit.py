@@ -11,9 +11,7 @@ from torch.optim import lr_scheduler
 import json
 from opt import opt
 from data import Data
-# from network import MGN
-from network_vit import ViTNetwork
-# from loss import Loss
+from network_vit import ViTWithResNet
 from loss_vit import Loss
 from utils.get_optimizer import get_optimizer
 from utils.extract_feature import extract_feature
@@ -22,7 +20,6 @@ from utils.metrics import re_ranking
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 
-# Change the num of workers in dataloader
 class Main():
     def __init__(self, model, loss, data):
         self.train_loader = data.train_loader
@@ -181,22 +178,28 @@ class Main():
 
 if __name__ == '__main__':
     data = Data()
-    model = ViTNetwork()
+    model = ViTWithResNet(
+        dim = 2048, 
+        depth = 12, 
+        heads = 16, 
+        mlp_dim= 4096
+    )
     loss = Loss()
     main = Main(model, loss, data)
 
     if opt.mode == 'train':
-        for epoch in range(1, opt.epoch + 1):
+        # hard coded to 300 epoch
+        for epoch in range(1, 251):
             print('\nepoch', epoch)
             main.train()
-            # if epoch % 50 == 0:
-            #     os.makedirs('weights', exist_ok=True)
-            #     torch.save(model.state_dict(), ('weights/model_{}.pt'.format(epoch)))
             if epoch % 50 == 0:
-                print('\nstart evaluate')
-                main.evaluate(epoch)
                 os.makedirs('weights', exist_ok=True)
                 torch.save(model.state_dict(), ('weights/model_{}.pt'.format(epoch)))
+            # if epoch % 50 == 0:
+            #     print('\nstart evaluate')
+            #     main.evaluate(epoch)
+            #     os.makedirs('weights', exist_ok=True)
+            #     torch.save(model.state_dict(), ('weights/model_{}.pt'.format(epoch)))
 
     if opt.mode == 'evaluate':
         print('start evaluate')
