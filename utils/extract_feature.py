@@ -5,13 +5,18 @@ def extract_feature(model, loader):
     features = torch.FloatTensor()
 
     for (inputs, labels) in loader:
-
         ff = torch.FloatTensor(inputs.size(0), 2048).zero_()
         for i in range(2):
             if i == 1:
                 inputs = inputs.index_select(3, torch.arange(inputs.size(3) - 1, -1, -1).long())
             input_img = inputs.to('cuda')
+
+            # print("Input size:", input_img.size())
+            # input_img.size() = ([8, 3, 128, 288])
             outputs = model(input_img)
+            print("Output size:", outputs.size())
+            # outputs.size() = ([8, 2048])
+
             f = outputs[0].data.cpu()
             ff = ff + f
 

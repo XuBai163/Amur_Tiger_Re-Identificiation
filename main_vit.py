@@ -10,15 +10,16 @@ import torch
 from torch.optim import lr_scheduler
 import json
 from opt import opt
-from data import Data
+from data_vit import Data
 from network_vit import ViTWithResNet
-from loss_vit import Loss
+from loss_vit import ViTLoss
 from utils.get_optimizer import get_optimizer
+# from utils.extract_feature_vit import extract_feature_vit
 from utils.extract_feature import extract_feature
 from utils.metrics import re_ranking
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
-os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
+# os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 
 class Main():
     def __init__(self, model, loss, data):
@@ -43,8 +44,8 @@ class Main():
             inputs = inputs.to('cuda')
             labels = labels.to('cuda')
             self.optimizer.zero_grad()
-            outputs = self.model(inputs)
-            loss = self.loss(outputs, labels)
+            logits, embeddings = self.model(inputs)
+            loss = self.loss(logits, embeddings, labels)
 
             loss.backward()
             self.optimizer.step()
@@ -57,7 +58,7 @@ class Main():
         print('extract features, this may take a few minutes')
         qf = extract_feature(self.model, tqdm(self.query_loader)).numpy()
         gf = extract_feature(self.model, tqdm(self.test_loader)).numpy()
-        epoch_json = 'metric/metric_epoch' + str(epoch)
+        epoch_json = 'metric/metric_epoch_vit' + str(epoch)
         # epoch_json = 'metric/metric_epoch_450'
         os.makedirs(epoch_json)
 
@@ -98,7 +99,7 @@ class Main():
 
         ######################### no re-rank ##########################
         dist = cdist(qf, gf)
-        result(dist, self.queryset.ids, self.testset.ids, title = 'without rerank')
+        result(dist, self.queryset.ids, self.testset.ids, title = 'without_rerank')
 
         ######################### re-rank ##########################
         q_g_dist = np.dot(qf, np.transpose(gf))
@@ -184,7 +185,7 @@ if __name__ == '__main__':
         heads = 16, 
         mlp_dim= 4096
     )
-    loss = Loss()
+    loss = ViTLoss()
     main = Main(model, loss, data)
 
     if opt.mode == 'train':
@@ -204,7 +205,7 @@ if __name__ == '__main__':
     if opt.mode == 'evaluate':
         print('start evaluate')
         model.load_state_dict(torch.load(opt.weight))
-        main.evaluate()
+        main.evaluate(250)
 
     if opt.mode == 'vis':
         print('visualize')

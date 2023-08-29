@@ -78,7 +78,7 @@ class Transformer(nn.Module):
         return self.norm(x)
     
 class ViTWithResNet(nn.Module):
-    def __init__(self, *, image_size=None, num_classes=107, dim, depth, heads, mlp_dim, pool = 'cls', channels = 3, dim_head = 64, dropout = 0., emb_dropout = 0.):
+    def __init__(self, *, image_size=None, num_classes=107, dim, depth, heads, mlp_dim, pool = 'mean', channels = 3, dim_head = 64, dropout = 0., emb_dropout = 0.):
         super().__init__()
 
         # Backbone network: ResNet50
@@ -108,7 +108,9 @@ class ViTWithResNet(nn.Module):
     def forward(self, img):
         # Use ResNet to extract features
         x = self.backbone(img)
-        x = x.view(x.size(0), 36, 2048)  # Shape: (B, 36, 2048)
+        # print("ResNet50 ouput features shape: ", x.shape)
+        # x.shape = ([8, 2048, 4, 9])
+        x = x.view(x.size(0), 36, 2048)
 
         b, n, _ = x.shape
         cls_tokens = repeat(self.cls_token, '1 1 d -> b 1 d', b=b)
@@ -119,5 +121,19 @@ class ViTWithResNet(nn.Module):
         x = self.transformer(x)
 
         x = x.mean(dim=1) if self.pool == 'mean' else x[:, 0]
-        x = self.to_latent(x)
-        return self.mlp_head(x)
+        embeddings = self.to_latent(x)
+
+        if self.training:
+            logits = self.mlp_head(embeddings)
+            return logits, embeddings
+        else:
+            # print("Output shape of transformer: ", embeddings.shape)
+            # x.shape = ([8, 2048])
+            return embeddings
+        
+        # if self.training:
+        #     return self.mlp_head(x)
+        # else:
+        #     return x
+
+        

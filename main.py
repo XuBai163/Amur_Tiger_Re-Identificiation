@@ -99,7 +99,7 @@ class Main():
 
         ######################### no re-rank ##########################
         dist = cdist(qf, gf)
-        result(dist, self.queryset.ids, self.testset.ids, title = 'without rerank')
+        result(dist, self.queryset.ids, self.testset.ids, title = 'without_rerank')
 
         ######################### re-rank ##########################
         q_g_dist = np.dot(qf, np.transpose(gf))
