@@ -15,7 +15,7 @@ from network_vit import ViTWithResNet
 from loss_vit import ViTLoss
 from utils.get_optimizer import get_optimizer
 # from utils.extract_feature_vit import extract_feature_vit
-from utils.extract_feature import extract_feature
+from utils.extract_feature_vit import extract_feature
 from utils.metrics import re_ranking
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
@@ -58,7 +58,7 @@ class Main():
         print('extract features, this may take a few minutes')
         qf = extract_feature(self.model, tqdm(self.query_loader)).numpy()
         gf = extract_feature(self.model, tqdm(self.test_loader)).numpy()
-        epoch_json = 'metric/metric_epoch_vit' + str(epoch)
+        epoch_json = 'metric/metric_epoch_vit_latest' + str(epoch)
         # epoch_json = 'metric/metric_epoch_450'
         os.makedirs(epoch_json)
 
@@ -180,17 +180,20 @@ class Main():
 if __name__ == '__main__':
     data = Data()
     model = ViTWithResNet(
-        dim = 2048, 
-        depth = 12, 
-        heads = 16, 
-        mlp_dim= 4096
+        # dim = 2048,
+        dim = 512,
+        depth = 4, 
+        # depth = 3, 
+        # depth = 2,
+        # depth = 4,
+        # depth = 12, 
+        heads = 16
     )
     loss = ViTLoss()
     main = Main(model, loss, data)
 
     if opt.mode == 'train':
-        # hard coded to 300 epoch
-        for epoch in range(1, 251):
+        for epoch in range(1, 301):
             print('\nepoch', epoch)
             main.train()
             if epoch % 50 == 0:
@@ -205,7 +208,7 @@ if __name__ == '__main__':
     if opt.mode == 'evaluate':
         print('start evaluate')
         model.load_state_dict(torch.load(opt.weight))
-        main.evaluate(250)
+        main.evaluate(300)
 
     if opt.mode == 'vis':
         print('visualize')

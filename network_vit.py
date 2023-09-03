@@ -78,7 +78,7 @@ class Transformer(nn.Module):
         return self.norm(x)
     
 class ViTWithResNet(nn.Module):
-    def __init__(self, *, image_size=None, num_classes=107, dim, depth, heads, mlp_dim, pool = 'mean', channels = 3, dim_head = 64, dropout = 0., emb_dropout = 0.):
+    def __init__(self, *, image_size=None, num_classes=107, dim, depth, heads, pool = 'mean', channels = 3, dim_head = 64, dropout = 0., emb_dropout = 0.):
         super().__init__()
 
         # Backbone network: ResNet50
@@ -93,7 +93,11 @@ class ViTWithResNet(nn.Module):
             resnet.layer3,
             resnet.layer4
         )
+        mlp_dim = 3 * dim
 
+        # This layer is added to reduce the dim from 2048 to dim
+        self.linear_reduction = nn.Linear(2048, dim)
+        
         self.pos_embedding = nn.Parameter(torch.randn(1, 37, dim))  # Including cls token
         self.cls_token = nn.Parameter(torch.randn(1, 1, dim))
         self.dropout = nn.Dropout(emb_dropout)
@@ -108,13 +112,16 @@ class ViTWithResNet(nn.Module):
     def forward(self, img):
         # Use ResNet to extract features
         x = self.backbone(img)
-        # print("ResNet50 ouput features shape: ", x.shape)
         # x.shape = ([8, 2048, 4, 9])
-        x = x.view(x.size(0), 36, 2048)
-
+        # x = x.view(x.size(0), 36, 2048)
+        x = x.view(x.size(0), 2048, -1)  # Reshaping to [batch_size, 2048, 36]
+        x = x.transpose(1, 2)  # Transposing to get [batch_size, 36, 2048]
+        x = self.linear_reduction(x) # Reduce layer to dim
+        
         b, n, _ = x.shape
         cls_tokens = repeat(self.cls_token, '1 1 d -> b 1 d', b=b)
         x = torch.cat((cls_tokens, x), dim=1)
+        # print("Shape after add cls: ", x.shape)
         x += self.pos_embedding[:, :(n + 1)]
         x = self.dropout(x)
 
@@ -127,13 +134,7 @@ class ViTWithResNet(nn.Module):
             logits = self.mlp_head(embeddings)
             return logits, embeddings
         else:
-            # print("Output shape of transformer: ", embeddings.shape)
             # x.shape = ([8, 2048])
             return embeddings
-        
-        # if self.training:
-        #     return self.mlp_head(x)
-        # else:
-        #     return x
 
         

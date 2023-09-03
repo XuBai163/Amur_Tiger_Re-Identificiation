@@ -4,7 +4,7 @@ from torchvision.datasets.folder import default_loader
 from utils.random_erasing import RandomErasing
 from utils.random_sampler import RandomSampler
 from torchvision.transforms import InterpolationMode
-from opt_pose import opt
+from resnet50_mgn_pose.opt_pose import opt
 import os
 import re
 import csv

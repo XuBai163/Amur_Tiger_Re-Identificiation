@@ -5,7 +5,8 @@ def extract_feature(model, loader):
     features = torch.FloatTensor()
 
     for (inputs, labels) in loader:
-        ff = torch.FloatTensor(inputs.size(0), 2048).zero_()
+        # ff = torch.FloatTensor(inputs.size(0), 2048).zero_()
+        ff = torch.FloatTensor(inputs.size(0), 512).zero_()
         for i in range(2):
             if i == 1:
                 inputs = inputs.index_select(3, torch.arange(inputs.size(3) - 1, -1, -1).long())
@@ -17,7 +18,7 @@ def extract_feature(model, loader):
             # print("Output size:", outputs.size())
             # outputs.size() = ([8, 2048])
 
-            f = outputs[0].data.cpu()
+            f = outputs.data.cpu()
             # outputs.data.cpu() Change for Resnet + Vit model.
             ff = ff + f
 
@@ -25,5 +26,3 @@ def extract_feature(model, loader):
         ff = ff.div(fnorm.expand_as(ff))
         features = torch.cat((features, ff), 0)
     return features
-
-

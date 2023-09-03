@@ -25,7 +25,7 @@ python main.py --mode train --data_path ./dataset
 Use pretrained weight or your trained weight
 
 ```
-python main.py --mode evaluate --data_path <path/to/dataset> --weight <path/to/weight_name.pt> 
+python main.py --mode evaluate --data_path ./dataset --weight ./output/resnet50_vit_depth2/weights/model_250.pt
 ```
 
 ## Visualize

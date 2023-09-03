@@ -3,8 +3,8 @@ from tqdm import tqdm
 import os
 from scipy.spatial.distance import cdist
 import json
-from data_pose import Data as Data_pose
-from network_pose import MGN as MGN_pose
+from resnet50_mgn_pose.data_pose import Data as Data_pose
+from resnet50_mgn_pose.network_pose import MGN as MGN_pose
 from utils.extract_feature_pose import extract_feature as extract_feature_pose
 import numpy as np
 from data import Data

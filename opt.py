@@ -3,7 +3,7 @@ import argparse
 parser = argparse.ArgumentParser(description='reid')
 
 parser.add_argument('--data_path',
-                    default="Market-1501-v15.09.15",
+                    default="dataset",
                     help='path of Market-1501-v15.09.15')
 
 parser.add_argument('--mode',
@@ -11,7 +11,8 @@ parser.add_argument('--mode',
                     help='train or evaluate ')
 
 parser.add_argument('--query_image',
-                    default='0001_c1s1_001051_00.jpg',
+                    # default='0001_c1s1_001051_00.jpg',
+                    default='000001.jpg',
                     help='path to the image you want to query')
 
 parser.add_argument('--freeze',
