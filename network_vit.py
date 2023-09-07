@@ -78,7 +78,7 @@ class Transformer(nn.Module):
         return self.norm(x)
     
 class ViTWithResNet(nn.Module):
-    def __init__(self, *, image_size=None, num_classes=107, dim, depth, heads, pool = 'mean', channels = 3, dim_head = 64, dropout = 0., emb_dropout = 0.):
+    def __init__(self, *, image_size=224, num_classes=107, dim, depth, heads, pool = 'mean', channels = 3, dim_head = 64, dropout = 0., emb_dropout = 0.):
         super().__init__()
 
         # Backbone network: ResNet50
@@ -93,12 +93,20 @@ class ViTWithResNet(nn.Module):
             resnet.layer3,
             resnet.layer4
         )
-        mlp_dim = 3 * dim
+
+        mlp_dim = 2 * dim
 
         # This layer is added to reduce the dim from 2048 to dim
-        self.linear_reduction = nn.Linear(2048, dim)
-        
-        self.pos_embedding = nn.Parameter(torch.randn(1, 37, dim))  # Including cls token
+        # self.linear_reduction = nn.Linear(2048, dim)
+
+        # Get spatial dimensions for position embeddings
+        # dummy_tensor = torch.randn(1, channels, image_size, image_size)
+        # out = self.backbone(dummy_tensor)
+        # n_positions = out.shape[-1] * out.shape[-2] + 1
+
+        n_positions = 73
+        self.pos_embedding = nn.Parameter(torch.randn(1, n_positions, dim))
+        # self.pos_embedding = nn.Parameter(torch.randn(1, 37, dim)) 
         self.cls_token = nn.Parameter(torch.randn(1, 1, dim))
         self.dropout = nn.Dropout(emb_dropout)
 
@@ -116,7 +124,7 @@ class ViTWithResNet(nn.Module):
         # x = x.view(x.size(0), 36, 2048)
         x = x.view(x.size(0), 2048, -1)  # Reshaping to [batch_size, 2048, 36]
         x = x.transpose(1, 2)  # Transposing to get [batch_size, 36, 2048]
-        x = self.linear_reduction(x) # Reduce layer to dim
+        # x = self.linear_reduction(x) # Reduce layer to dim
         
         b, n, _ = x.shape
         cls_tokens = repeat(self.cls_token, '1 1 d -> b 1 d', b=b)

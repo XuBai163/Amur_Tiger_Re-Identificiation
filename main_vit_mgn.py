@@ -11,11 +11,11 @@ from torch.optim import lr_scheduler
 import json
 from opt import opt
 from data_vit import Data
-from network_vit import ViTWithResNet
-from loss_vit import ViTLoss
+from network_vit_mgn import CombinedModel
+from loss_vit_mgn import Loss
 from utils.get_optimizer import get_optimizer
 # from utils.extract_feature_vit import extract_feature_vit
-from utils.extract_feature_vit import extract_feature
+from utils.extract_feature_vit_mgn import extract_feature
 from utils.metrics import re_ranking
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
@@ -44,8 +44,8 @@ class Main():
             inputs = inputs.to('cuda')
             labels = labels.to('cuda')
             self.optimizer.zero_grad()
-            logits, embeddings = self.model(inputs)
-            loss = self.loss(logits, embeddings, labels)
+            logits, combined_embeddings, mgn_outputs = self.model(inputs)
+            loss = self.loss(combined_embeddings, logits, mgn_outputs, labels)
 
             loss.backward()
             self.optimizer.step()
@@ -179,17 +179,8 @@ class Main():
 
 if __name__ == '__main__':
     data = Data()
-    model = ViTWithResNet(
-        # dim = 2048,
-        dim = 2048,
-        depth = 4, 
-        # depth = 3, 
-        # depth = 2,
-        # depth = 4,
-        # depth = 12, 
-        heads = 16
-    )
-    loss = ViTLoss()
+    model = CombinedModel()
+    loss = Loss()
     main = Main(model, loss, data)
 
     if opt.mode == 'train':
